@@ -26,7 +26,7 @@ class Job_Queue(object):
     def append(self, process):
         if not self._closed:
             if self._debug:
-                print("job queue appended to.")
+                print("job queue appended %s." % process.name)
             self._queued.append(process)
 
     def start(self):
@@ -46,10 +46,10 @@ class Job_Queue(object):
 
         while not self._finished:
 
-            while len(self._running) < self._max:
+            while len(self._running) < self._max and self._queued:
                 if self._debug:
                     print("job queue running queue filling.")
-
+              
                 job = self._queued.pop()
                 job.start()
                 self._running.append(job)
@@ -59,18 +59,22 @@ class Job_Queue(object):
                 for id, job in enumerate(self._running):
                     if not job.is_alive():
                         if self._debug:
-                            print("job queue found finished proc.")
+                            print("job queue found finished proc: %s." %
+                                    job.name)
 
                         done = self._running.pop(id)
                         self._completed.append(done)
 
-            if self._debug:
-                print("job queue has %d running." % len(self._running))
+                        if self._debug:
+                            print("job queue has %d running." % len(self._running))
 
             if not (self._queued and self._running): #and 
                 #len(self._completed) == self._num_of_jobs):
                 if self._debug:
                     print("job queue finished.")
+
+                for job in self._completed:
+                    job.join()
 
                 self._finished = True
 
