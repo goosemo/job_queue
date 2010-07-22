@@ -1,6 +1,5 @@
----------
 Job_Queue
----------
+=========
 
 This is an answer to the fact that Pool() isn't working how I need it to for a
 project. So I made a super simple running queue, that has a bubble of
