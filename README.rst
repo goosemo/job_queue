@@ -1,6 +1,5 @@
----------
 Job_Queue
----------
+=========
 
 This is an answer to the fact that Pool() isn't working how I need it to for a
 project. So I made a super simple running queue, that has a bubble of
@@ -39,5 +38,4 @@ Github messages are fine, username goosemo. But best way to reach me is via
 email at morgan.goose@gmail.com
 
 I welcome suggestions, and bug reports.
-
 
