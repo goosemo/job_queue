@@ -34,6 +34,12 @@ class Job_Queue(object):
         """
         return all([x.is_alive() for x in self._running])
 
+    def __len__():
+        """
+        Just going to use number of jobs as the Job_Queue length.
+        """
+        return self._num_of_jobs
+    
     def close(self):
         """
         A sanity check, so that the need to care about new jobs being added in
@@ -42,7 +48,6 @@ class Job_Queue(object):
         if self._debug:
             print("job queue closed.")
 
-        self._num_of_jobs = len(self._queued)
         self._closed = True
 
     def append(self, process):
@@ -52,6 +57,7 @@ class Job_Queue(object):
         """
         if not self._closed:
             self._queued.append(process)
+            self._num_of_jobs += 1
             if self._debug:
                 print("job queue appended %s." % process.name)
 
