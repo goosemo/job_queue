@@ -129,21 +129,26 @@ class Job_Queue(object):
                 self._finished = True
 
 
-def test_Job_Queue():
+def try_using(parallel_type):
 
     def print_number(number):
         print(number)
 
-    from multiprocessing import Process
+    if parallel_type == "multiprocessing":
+        from multiprocessing import Process as Bucket
+
+    elif parallel_type == "threading":
+        from threading import Thread as Bucket
+
 
     jobs = Job_Queue(5)
     jobs._debug = True
 
     for x in range(20):
-        jobs.append(Process(
+        jobs.append(Bucket(
             target = print_number,
             args = [x],
-            kwargs = [],
+            kwargs = {},
             ))
 
     jobs.close()
@@ -151,4 +156,7 @@ def test_Job_Queue():
 
 
 if __name__ == '__main__':
-    test_Job_Queue()
+    try_using("multiprocessing")
+    print 
+    try_using("threading")
+    print 
