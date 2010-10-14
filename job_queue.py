@@ -32,7 +32,11 @@ class Job_Queue(object):
         Simply states if all procs are alive or not. Needed to determine when
         to stop looping, and pop dead procs off and add live ones.
         """
-        return all([x.is_alive() for x in self._running])
+        if self._running:
+            return all([x.is_alive() for x in self._running])
+
+        else:
+            return False
 
     def __len__(self):
         """
