@@ -161,6 +161,4 @@ def try_using(parallel_type):
 
 if __name__ == '__main__':
     try_using("multiprocessing")
-    print 
     try_using("threading")
-    print 
