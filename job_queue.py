@@ -34,7 +34,7 @@ class Job_Queue(object):
         """
         return all([x.is_alive() for x in self._running])
 
-    def __len__():
+    def __len__(self):
         """
         Just going to use number of jobs as the Job_Queue length.
         """
