@@ -47,8 +47,18 @@ class Job_Queue(object):
         Simply states if all procs are alive or not. Needed to determine when
         to stop looping, and pop dead procs off and add live ones.
         """
-        return all([x.is_alive() for x in self._running])
+        if self._running:
+            return all([x.is_alive() for x in self._running])
 
+        else:
+            return False
+
+    def __len__(self):
+        """
+        Just going to use number of jobs as the Job_Queue length.
+        """
+        return self._num_of_jobs
+    
     def close(self):
         """
         A sanity check, so that the need to care about new jobs being added in
@@ -57,7 +67,6 @@ class Job_Queue(object):
         if self._debug:
             print("job queue closed.")
 
-        self._num_of_jobs = len(self._queued)
         self._closed = True
 
     def append(self, process):
@@ -67,6 +76,7 @@ class Job_Queue(object):
         """
         if not self._closed:
             self._queued.append(process)
+            self._num_of_jobs += 1
             if self._debug:
                 print("job queue appended %s." % process.name)
 
@@ -139,12 +149,11 @@ class Job_Queue(object):
 
 #### Sample 
 
-def sample_job_queue():
+def try_using(parallel_type):
     """
     This will run the queue through it's paces, and show a simple way of using
-    the job queue. For a more indepth look, peruse the test suite.
+    the job queue. 
     """
-
 
     def print_number(number):
         """
@@ -152,7 +161,12 @@ def sample_job_queue():
         """
         print(number)
 
-    from multiprocessing import Process
+    if parallel_type == "multiprocessing":
+        from multiprocessing import Process as Bucket
+
+    elif parallel_type == "threading":
+        from threading import Thread as Bucket
+
 
     # Make a job_queue with a bubble of len 5, and have it print verbosely
     jobs = Job_Queue(5)
@@ -160,10 +174,10 @@ def sample_job_queue():
 
     # Add 20 procs onto the stack
     for x in range(20):
-        jobs.append(Process(
+        jobs.append(Bucket(
             target = print_number,
             args = [x],
-            kwargs = [],
+            kwargs = {},
             ))
 
     # Close up the queue and then start it's execution
@@ -172,4 +186,5 @@ def sample_job_queue():
 
 
 if __name__ == '__main__':
-    sample_job_queue()
+    try_using("multiprocessing")
+    try_using("threading")
