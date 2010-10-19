@@ -1,4 +1,9 @@
+"""
+This module provides a Job_queue class, and an example of use. One may drop in
+either multiprocessing Prcoesses or threading Threads, as I have show in the
+test suite.
 
+"""
 
 class Job_Queue(object):
     """
@@ -8,16 +13,26 @@ class Job_Queue(object):
     So if the bubble is 5 start with 5 running and move the bubble of running
     procs along the queue looking something like this:
 
-    ---------------------------
-    [-----]--------------------
-    ---[-----]-----------------
-    ---------[-----]-----------
-    ------------------[-----]--
-    --------------------[-----]
-    ---------------------------
+        ........................... Start
+
+        [.....].................... 
+
+        ...[.....]................. 
+
+        .........[.....]........... 
+
+        ..................[.....].. 
+
+        ....................[.....] 
+
+        ........................... End 
+
     """
 
     def __init__(self, max_running):
+        """
+        Setup the class to resonable defaults.
+        """
         self._queued = []
         self._running = []
         self._completed = []
@@ -122,17 +137,28 @@ class Job_Queue(object):
 
                 self._finished = True
 
+#### Sample 
 
-def test_Job_Queue():
+def sample_job_queue():
+    """
+    This will run the queue through it's paces, and show a simple way of using
+    the job queue. For a more indepth look, peruse the test suite.
+    """
+
 
     def print_number(number):
+        """
+        Simple function to give a simple task to execute.
+        """
         print(number)
 
     from multiprocessing import Process
 
+    # Make a job_queue with a bubble of len 5, and have it print verbosely
     jobs = Job_Queue(5)
     jobs._debug = True
 
+    # Add 20 procs onto the stack
     for x in range(20):
         jobs.append(Process(
             target = print_number,
@@ -140,9 +166,10 @@ def test_Job_Queue():
             kwargs = [],
             ))
 
+    # Close up the queue and then start it's execution
     jobs.close()
     jobs.start()
 
 
 if __name__ == '__main__':
-    test_Job_Queue()
+    sample_job_queue()
