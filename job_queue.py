@@ -69,6 +69,8 @@ class Job_Queue(object):
         """
         Add the Process() to the queue, so that later it can be checked up on.
         That is if the Job_Queue is still open.
+
+        If the queue is closed, this will just silently do nothing.
         """
         if not self._closed:
             self._queued.append(process)
