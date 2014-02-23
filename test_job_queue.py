@@ -20,13 +20,13 @@ class Test_Job_Queue():
         assert_true(jobs._debug)
 
 
-    def populate(self):
-        jobs = Job_Queue(5)
+    def populate(self,queue_size=5,job_size=10):
+        jobs = Job_Queue(queue_size)
     
         def foo():
             return 10
     
-        for x in range(10):
+        for x in range(job_size):
             jobs.append(self.Bucket(
                 target = foo, 
                 args = [],
@@ -34,6 +34,13 @@ class Test_Job_Queue():
                 ))
 
         return jobs
+
+    def test_empty(self):
+	"""This case is when less jobs than the size of the queue are added
+	"""
+        jobs = self.populate(2,1)
+        jobs.close()
+        jobs.start()
 
     @raises(Exception)
     def test_some(self):
