@@ -112,7 +112,7 @@ class Job_Queue(object):
             print("Job queue starting.")
             print("Job queue intial running queue fill.")
 
-        while len(self._running) < self._max:
+        while len(self._running) < self._max and len(self._queued) > 0:
             _advance_the_queue()
 
         while not self._finished:
@@ -167,7 +167,7 @@ def try_using(parallel_type):
 
 
     # Make a job_queue with a bubble of len 5, and have it print verbosely
-    jobs = Job_Queue(5)
+    jobs = Job_Queue(2)
     jobs._debug = True
 
     # Add 20 procs onto the stack
