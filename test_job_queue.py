@@ -1,6 +1,17 @@
+import sys 
 from nose.tools import *
-from job_queue import Job_Queue
+from job_queue import Job_Queue, try_using
+from cStringIO import StringIO
 
+
+class Capturing(list):
+    def __enter__(self):
+        self._stdout = sys.stdout
+        sys.stdout = self._stringio = StringIO()
+        return self
+    def __exit__(self, *args):
+        self.extend(self._stringio.getvalue().splitlines())
+        sys.stdout = self._stdout
 
 class Test_Job_Queue():
 
@@ -20,12 +31,13 @@ class Test_Job_Queue():
         assert_true(jobs._debug)
 
 
-    def populate(self,queue_size=5,job_size=10):
+    def populate(self,queue_size=5,job_size=10,debug=False):
         jobs = Job_Queue(queue_size)
-    
+        jobs._debug = debug
+     
         def foo():
             return 10
-    
+     
         for x in range(job_size):
             jobs.append(self.Bucket(
                 target = foo, 
@@ -71,6 +83,21 @@ class Test_Job_Queue():
         assert_false(jobs._all_alive())
         assert_equal(jobs._running,[])
 
+    def test_runs_debug(self):
+        with Capturing() as output:
+            jobs = self.populate(debug=True)
+            jobs.close()
+            assert_false(jobs._finished)
+            jobs.start()
+            assert_true(jobs._finished)
+            assert_false(jobs._all_alive())
+            assert_equal(jobs._running,[])
+
+        assert_true(len(output)>0)
+
+    def test_runs_try_using(self):
+        try_using("multiprocessing")
+        try_using("threading")
 
 class Test_Job_Queue_Threads(Test_Job_Queue):
 

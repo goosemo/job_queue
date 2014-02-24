@@ -78,6 +78,18 @@ class Job_Queue(object):
             if self._debug:
                 print("job queue appended %s." % process.name)
 
+    def _advance_the_queue(self):
+        """
+        Helper function to do the job of poping a new proc off the queue
+        start it, then add it to the running queue. This will eventually
+        depleate the _queue, which is a condition of stopping the running
+        while loop.
+        """
+        while len(self._running) < self._max and self._queued:
+            job = self._queued.pop()
+            job.start()
+            self._running.append(job)
+
     def start(self):
         """
         This is the workhorse. It will take the intial jobs from the _queue,
@@ -94,16 +106,6 @@ class Job_Queue(object):
         When all if finished, it will exit the loop, and disconnect_all()
         """
 
-        def _advance_the_queue():
-            """
-            Helper function to do the job of poping a new proc off the queue
-            start it, then add it to the running queue. This will eventually
-            depleate the _queue, which is a condition of stopping the running
-            while loop.
-            """
-            job = self._queued.pop()
-            job.start()
-            self._running.append(job)
 
         if not self._closed:
             raise Exception("Need to close() before starting.")
@@ -112,16 +114,14 @@ class Job_Queue(object):
             print("Job queue starting.")
             print("Job queue intial running queue fill.")
 
-        while len(self._running) < self._max and len(self._queued) > 0:
-            _advance_the_queue()
+        self._advance_the_queue()
 
         while not self._finished:
 
-            while len(self._running) < self._max and self._queued:
-                if self._debug:
-                    print("Job queue running queue filling.")
-              
-                _advance_the_queue()
+            if self._debug:
+                print("Job queue running queue filling.")
+             
+            self._advance_the_queue()
 
             if not self._all_alive():
                 for id, job in enumerate(self._running):
